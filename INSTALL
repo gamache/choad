@@ -1,0 +1,41 @@
+Requirements:
+
+ * Perl 5 or greater
+   author: Larry Wall
+   homepage: http://www.perl.com
+   download: http://www.perl.com/CPAN/src/stable.tar.gz
+
+ * cdparanoia (tested: v. III alpha 9.7) 
+   author: Monty <monty@xiph.org> and Xiphophorus
+   homepage: http://www.xiph.org/paranoia/index.html
+   download: 
+    http://www.xiph.org/paranoia/download/cdparanoia-III-alpha9.7.src.tgz
+
+ * lame (tested: v3.87)
+   author: Mark Taylor <mt@sulaco.org>
+   homepage: http://www.sulaco.org/mp3/
+   download: http://www.sulaco.org/mp3/download/download.html
+
+ * CDDB.pm (tested: v1.03)
+   author: Rocco Caputo <troc@netrus.net>
+   download: http://www.cpan.org/authors/id/R/RC/RCAPUTO/CDDB-1.03.tar.gz
+
+for submitting CDDB information:
+
+ * MailTools Perl modules (tested: v1.15)
+   author: Graham Barr <gbarr@pobox.com>
+   download: http://www.cpan.org/authors/id/GBARR/MailTools-1.15.tar.gz
+
+ * libnet Perl modules (tested: v1.0703)
+   author: Graham Barr <gbarr@pobox.com>
+   download: http://www.cpan.org/authors/id/GBARR/libnet-1.0703.tar.gz
+
+To install:
+
+ 1. Change the first line of the "choad" file to point to wherever perl
+    is installed on your system.  The default is /usr/bin/perl.
+
+ 2. Copy "choad" into a directory in your PATH (such as /usr/bin or
+    /usr/local/bin).
+
+ 3. Type "choad -longhelp" for instructions on usage.

@@ -1,0 +1,40 @@
+Choad 0.8:
+ a Perl-based command-line front end to cdparanoia, CDDB, and lame
+ copyright 2001  pete gamache  gamache@ftso.org
+ http://www.ftso.org/choad/
+
+(read the INSTALL file for installation instructions and requirements)
+
+
+Choad is a customizable CD-ripper-ID3-tagger-and-mp3-encoder[*] written
+in Perl and using Rocco Caputo's 'CDDB.pm' Perl module, Monty's 'cdparanoia' 
+CD ripper, and Mark Taylor's 'lame' mp3 encoder.  I wrote it because I
+was sick of typing song titles in my hand, and the other rip/encode/ID3
+utilities I'd tried didn't do everything I would have liked.  Here are
+some features:
+
+* Choad pipes output from cdparanoia directly into lame; no .wav files are
+  written.  This is good for low-disk-space operation, or where disk access
+  is an issue (such as saving to network volumes).
+
+* Choad allows the user to specify a format string to specify where the
+  mp3s will end up, and what their names will look like.  This allows
+  great flexibility in the directory structure and naming format of the
+  user's mp3 archive.
+
+* Choad can take input from a track listing file (a "tracks" file) instead
+  of a CDDB lookup.  This allows simple naming and ID3 tagging of obscure
+  CDs whose information has not made it into a CDDB database.
+
+* Choad can submit track listings to CDDB servers.
+
+Choad is free software, distributed under the same terms as Perl itself.
+Enjoy!
+
+-pete gamache
+ gamache@ftso.org
+
+
+[*] "...but I just met 'er!"
+
+
