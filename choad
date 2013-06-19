@@ -1,7 +1,7 @@
 #!/usr/pkg/bin/perl
 #
 # choad
-# 
+#
 # a command-line front end to cdparanoia and lame
 #
 # copyright 2001  pete gamache  gamache@ftso.org
@@ -16,12 +16,12 @@
 #
 # 0.721: fixed typo in clean_up_string()
 #
-# 0.8:   now follows strict syntax; tweaked around with query_CD and 
+# 0.8:   now follows strict syntax; tweaked around with query_CD and
 #        get_CDDB_info(); fixed capitalization bug in parse_format_string()
 #        added -submit option
 # 0.81:  avoided lame --tg problems
 # 0.82:  added "--" to cdparanoia command line in rip_track_with_name()
-#        fixed exactly-one-CDDB-match ID3 bug 
+#        fixed exactly-one-CDDB-match ID3 bug
 # 0.822: added track numbering support for the kids
 
 require 5;
@@ -51,7 +51,7 @@ my $cddb_port = 888;
 
 my $auto = $false;
 my $nocddb = $false;
-my $we_have_names = $false;  # if we have artist/title/track list 
+my $we_have_names = $false;  # if we have artist/title/track list
 
 my $maketracks = $true;
 my $encode = $true;
@@ -95,7 +95,7 @@ if ($encode == $true) {
         while (<@onlyv>) {
             my $i = shift @onlyv;
             my $n = shift @onlyv;
-            
+
             if ($n eq "auto") {$n = $trackname;}
             make_appropriate_dirs ($n);
             rip_track_with_name ($i, parse_format_string($n, $i));
@@ -135,12 +135,12 @@ sub get_CDDB_info {
 #    print $MSF_info;
     my @toc = split /\//, $MSF_info;
 
-    my ($cddb_id, $track_numbers, $track_lengths, $track_offsets, 
+    my ($cddb_id, $track_numbers, $track_lengths, $track_offsets,
         $total_seconds) = $cddb->calculate_id(@toc);
 
     my @discs = $cddb->get_discs($cddb_id, $track_offsets, $total_seconds);
 
-    my $discchoice = 1; 
+    my $discchoice = 1;
     my $i=0;
     if (scalar @discs > 1) {
         if ($auto == $false) {
@@ -150,11 +150,11 @@ sub get_CDDB_info {
                 print "$i  $title\n";
             }
           ASK: print "\nWhich disc? ";
-            
+
             while ((my $c .= getc STDIN) ne "\n") {
                 $discchoice = $c;
             }
-            
+
             if ($discchoice > scalar @discs) {
                 print "Too high; try again.";
                 goto ASK;
@@ -163,17 +163,17 @@ sub get_CDDB_info {
         $we_have_names = $true;
     } elsif (scalar @discs == 0) {
         print STDERR "No CDDB entry for this disc (id=0x$cddb_id)\n";
-	$we_have_names = $false;
+        $we_have_names = $false;
     } else {
         $we_have_names = $true;
     }
 
   #  my ($genre_, $title);
     if (scalar @discs > 0) {
-	($genre, my $cddb_id, my $title) = @{$discs[$discchoice-1]};
-	$title=~/([^\/]*) \/ (.*)/; 
-	$artist = $1; $album = $2;
-    
+        ($genre, my $cddb_id, my $title) = @{$discs[$discchoice-1]};
+        $title=~/([^\/]*) \/ (.*)/;
+        $artist = $1; $album = $2;
+
     my $disc_info     = $cddb->get_disc_details($genre, $cddb_id);
     @tracks  = @{$disc_info->{ttitles}};
     }
@@ -185,49 +185,49 @@ sub submit_CD {
 
     use CDDB;
 #    use MailTools;
-    
+
     my @toc = split /\t/, $MSF_info;
 
     my $cddb = new CDDB ( Host  => $cddb_host,
-			  Port  => $cddb_port,
-			  Login => "$USER\@$HOST",
-			  );
+                          Port  => $cddb_port,
+                          Login => "$USER\@$HOST",
+                          );
 
     if (scalar @tracks != $how_many_tracks) {
-	print STDERR
-	    "Track list has too many or too few songs.  Not submitting.\n";
-	return;
+        print STDERR
+            "Track list has too many or too few songs.  Not submitting.\n";
+        return;
     }
 
     my ($cddb_id,       # used for further CDDB queries
-	$track_numbers, # padded with 0's provided as a convenience
-	$track_lengths, # length of each track, in MM:SS format
-	$track_offsets, # absolute offsets (used for further CDDB queries)
-	$total_seconds  # total play time, in MM:SS format
-	) = $cddb->calculate_id(@toc);
-    
+        $track_numbers, # padded with 0's provided as a convenience
+        $track_lengths, # length of each track, in MM:SS format
+        $track_offsets, # absolute offsets (used for further CDDB queries)
+        $total_seconds  # total play time, in MM:SS format
+        ) = $cddb->calculate_id(@toc);
+
     my $YN = "n";
 ASK:
     print "Are you sure the above info is correct? (y/N) ";
     while ((my $c .= getc STDIN) ne "\n") {
-	$YN = $c;
+        $YN = $c;
     };
     if (uc $YN eq "N") {
-	print "\nOkay, not submitting.\n";
+        print "\nOkay, not submitting.\n";
     } elsif (uc $YN ne "Y") {
-	print "\n\"$YN\" not understood.  Try again.\n";
-	goto ASK;
+        print "\n\"$YN\" not understood.  Try again.\n";
+        goto ASK;
     }
 
     $cddb->submit_disc
-	( Genre       => $genre,
-	  Id          => $cddb_id,
-	  Artist      => $artist,
-	  DiscTitle   => $album,
-	  Offsets     => $track_offsets,
-	  TrackTitles => \@tracks,
-	  From        => "$USER\@$HOST"
-	  );
+        ( Genre       => $genre,
+          Id          => $cddb_id,
+          Artist      => $artist,
+          DiscTitle   => $album,
+          Offsets     => $track_offsets,
+          TrackTitles => \@tracks,
+          From        => "$USER\@$HOST"
+          );
 }
 
 sub make_appropriate_dirs {
@@ -235,7 +235,7 @@ sub make_appropriate_dirs {
 # returns directory name
 
     my $fmtstring = $_[0];
-    my $dir = parse_format_string ($fmtstring, 1); 
+    my $dir = parse_format_string ($fmtstring, 1);
     if (! ($dir=~/\//)) {return "";}  #no dirs to create
     $dir =~s/(.*)\/[^\/]+$/$1/; #strip mp3 name from end
     my @dirs = split /\//, $dir;
@@ -253,16 +253,16 @@ sub rip_track_with_name {
     my $tracknumber = $_[0];
     my $mp3name = $_[1];
     if ($mp3name eq "") {return};
-    
+
     my $lameoptions = $lameflags;
     if ($we_have_names == $true) {
-        $lameoptions .= 
+        $lameoptions .=
             " --tt \"$tracks[$tracknumber-1]\" --ta \"$artist\" --tl \"$album\" --tn $tracknumber";
 # why i left that "--tn $tracknumber" out in the first damn place, i dunno.
 
     }
 
-    my $command = 
+    my $command =
      "$cdparanoia $cdpflags -- $tracknumber - | $lame $lameoptions - \"$mp3name\"";
 
     print STDERR "$command\n";
@@ -291,7 +291,7 @@ sub parse_config_file {
 
 sub parse_tracks_file {
     my $tracksfile = $_[0];
-    
+
     open TRACKS, $tracksfile or die "Could not open $tracksfile: $!\n";
     while (<TRACKS>) {
         my $j; $j++;
@@ -302,7 +302,7 @@ sub parse_tracks_file {
             elsif (/^title\s*(.*)\s*$/) {
                 $album = clean_up_string($1);
             }
-	    elsif (/^genre\s*(.*)\s*$/) {
+            elsif (/^genre\s*(.*)\s*$/) {
                 $genre = clean_up_string($1);
             }
             elsif (/^track\s*([0-9]+)\s(.*)\s*$/) {
@@ -382,7 +382,7 @@ sub parse_command_line {
         }
         elsif ($_[0] eq "-longhelp") {
             print longhelp(); exit 0;
-        } 
+        }
         elsif ($_[0] eq "-only") {
             shift;  while (@_) {@onlyv = (@onlyv, shift);}
         }
@@ -394,7 +394,7 @@ sub parse_command_line {
 }
 
 #######################################################################
-# 
+#
 # string-twiddling routines
 #
 #######################################################################
@@ -419,8 +419,8 @@ sub parse_format_string {
             } elsif (uc $type eq "L") {
                 $replacement_text = ($type eq "l") ? lc $album : $album;
             } elsif (uc $type eq "T") {
-                $replacement_text = scalar @tracks ? ($type eq "t")? 
-		    lc $tracks[$tracknumber-1] : $tracks[$tracknumber-1]
+                $replacement_text = scalar @tracks ? ($type eq "t")?
+                    lc $tracks[$tracknumber-1] : $tracks[$tracknumber-1]
                     : sprintf("track %02d", $tracknumber);
             } elsif (uc $type eq "N") {
                 my $tn_format_string = "%d";
@@ -456,7 +456,7 @@ sub parse_format_string {
                 }
             }
             # error fixed here
-	    $replacement_text = clean_up_string($replacement_text);
+            $replacement_text = clean_up_string($replacement_text);
             substr($format_string, $i, $width) = $replacement_text;
             $i += length $replacement_text;
         } else {
@@ -501,12 +501,12 @@ sub query_CD {
     # also sets $how_many_tracks
 
     my $toc = "";
-    my $command = "$cdparanoia $cdpflags -Q 2>/tmp/choad-$$"; 
+    my $command = "$cdparanoia $cdpflags -Q 2>/tmp/choad-$$";
 
     `$command`;
     open QUERY, "/tmp/choad-$$" or die $!;
     while (<QUERY>) {
-	print $_;
+        print $_;
         if (/\s*([0-9]+)\.\s+[0-9]+\s+\[[0-9]+:[0-9]+\.[0-9]+\]\s+[0-9]+\s+\[([0-9]+):([0-9]+)\.([0-9]+)\]/) {  # that's a mouthful
             $toc .= "$1 $2 $3 $4/";
             $how_many_tracks = $1;
@@ -556,7 +556,7 @@ options:
   -noencode                  do not encode CD
   -auto                      ask user no questions (Do The Right Thing)
   -trackname "string"        use "string" as track name format string
-                             [default="$trackname_default"]  
+                             [default="$trackname_default"]
   -the                       do not strip leading "the" from artist name
   -from <n>                  start encoding at track <n>
   -h                         print help message
@@ -581,8 +581,8 @@ sub longhelp {
 $version_string
 $usage
 submit:
-  In order to submit CDDB data, you must have the MailTools and libnet 
-  collections of Perl modules installed.  Additionally, you should set 
+  In order to submit CDDB data, you must have the MailTools and libnet
+  collections of Perl modules installed.  Additionally, you should set
   the SMTPHOSTS enviromnent variable to your outgoing mail host, like:
 
    bash: \$ SMTPHOSTS=smtp.mydomain.com choad
@@ -595,7 +595,7 @@ choadrc configuration files:
   options; lines in choadrc files of the form "option" or "option = value"
   are equivalent to command line options "-option" and "-option value",
   respectively.  These commands are processed as if they were inserted onto
-  the command line, either before the other options (in the case of 
+  the command line, either before the other options (in the case of
   /etc/choadrc and ~/.choadrc) or in the place where "-choadrc <file>"
   occurs.  Later options override earlier options on the command line.
 
@@ -627,12 +627,12 @@ Format strings:
   to lowercase.
 
   For instance, given a song named "Unsatisfied" by The Replacements
-  (track 7 on album "Let It Be"): 
+  (track 7 on album "Let It Be"):
 
   Format string "%A[30]/%l_[30]/%NN - %t_[10].mp3" yields
-  "Replacements/let_it_be/07 - unsatisfie.mp3".  
+  "Replacements/let_it_be/07 - unsatisfie.mp3".
 
-  If the format string refers to directories that don't exist, $choad will 
+  If the format string refers to directories that don't exist, $choad will
   try to create them.
 
 "tracks" file:
